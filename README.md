@@ -45,6 +45,13 @@ Open [http://localhost:3000/](http://localhost:3000/) to see your Dapp. You will
 need to have [Metamask](http://metamask.io) installed and listening to
 `localhost 8545`.
 
+
+If account have no ETH, the page show:
+You don't have tokens to transfer
+To get some tokens, open a terminal in the root of the repository and run:
+npx buidler --network localhost faucet 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+
+
 ## User Guide
 
 You can find detailed instructions on using this repository and many tips in [its documentation](http://buidler.dev/tutorial).
