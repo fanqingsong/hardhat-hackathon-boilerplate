@@ -25,11 +25,18 @@ async function main() {
 
   console.log("Token address:", token.address);
 
+  const DeviceList = await ethers.getContractFactory("DeviceList");
+  const deviceList = await DeviceList.deploy();
+  await deviceList.deployed();
+
+  console.log("DeviceList address:", deviceList.address);
+
+
   // We also save the contract's artifacts and address in the frontend directory
-  saveFrontendFiles(token);
+  saveFrontendFiles(token, deviceList);
 }
 
-function saveFrontendFiles(token) {
+function saveFrontendFiles(token, deviceList) {
   const fs = require("fs");
   const contractsDir = __dirname + "/../frontend/src/contracts";
 
@@ -39,12 +46,18 @@ function saveFrontendFiles(token) {
 
   fs.writeFileSync(
     contractsDir + "/contract-address.json",
-    JSON.stringify({ Token: token.address }, undefined, 2)
+    JSON.stringify({ Token: token.address,
+                    DeviceList: deviceList.address }, undefined, 2)
   );
 
   fs.copyFileSync(
     __dirname + "/../artifacts/Token.json",
     contractsDir + "/Token.json"
+  );
+
+  fs.copyFileSync(
+    __dirname + "/../artifacts/DeviceList.json",
+    contractsDir + "/DeviceList.json"
   );
 }
 

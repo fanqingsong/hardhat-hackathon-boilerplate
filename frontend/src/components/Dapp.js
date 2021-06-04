@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
 import TokenArtifact from "../contracts/Token.json";
+import DeviceListArtifact from "../contracts/DeviceList.json";
 import contractAddress from "../contracts/contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
@@ -18,6 +19,8 @@ import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
+
+import { DeviceList } from "./DeviceList";
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -41,9 +44,11 @@ export class Dapp extends React.Component {
     this.initialState = {
       // The info of the token (i.e. It's Name and symbol)
       tokenData: undefined,
+
       // The user's address and balance
       selectedAddress: undefined,
       balance: undefined,
+
       // The ID about transactions being sent, and any possible error with them
       txBeingSent: undefined,
       transactionError: undefined,
@@ -88,6 +93,8 @@ export class Dapp extends React.Component {
     // If everything is loaded, we render the application.
     return (
       <div className="container p-4">
+        <DeviceList></DeviceList>
+
         <div className="row">
           <div className="col-12">
             <h1>
