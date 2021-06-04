@@ -5,4 +5,12 @@ usePlugin("@nomiclabs/buidler-waffle");
 // testing the frontend.
 require("./tasks/faucet");
 
-module.exports = {};
+module.exports = {
+    defaultNetwork: "hardhat",
+    networks: {
+        hardhat: {
+            url: "",
+            chainId: 1337
+        },
+    },
+};
