@@ -20,24 +20,66 @@ export class DeviceList extends React.Component {
     this.initialState = {
       deviceListData: undefined,
 
+      newDevice: undefined,
+
       txBeingSent: undefined,
       transactionError: undefined,
       networkError: undefined,
     };
 
     this.state = this.initialState;
+
+    this.onNewDeviceChange = this.onNewDeviceChange.bind(this);
+    this.onNewDeviceSubmit = this.onNewDeviceSubmit.bind(this);
+    this.onFormSubmit = this.onFormSubmit.bind(this);
+    this.onDeviceToggle = this.onDeviceToggle.bind(this);
+  }
+
+  onNewDeviceChange(e) {
+    let newDevice = e.target.value;
+
+    this.setState({"newDevice": newDevice})
+  }
+
+  onNewDeviceSubmit(e) {
+    let newDevice = this.state.newDevice;
+
+    this._createDevice(newDevice)
+  }
+
+  onDeviceToggle(id) {
+    let deviceListData = this.state.deviceListData;
+    let devices = deviceListData.devices;
+
+    devices.forEach(oneDevice => {
+      let _id = oneDevice.id;
+
+      if (id === _id) {
+        oneDevice.completed = !oneDevice.completed;
+      }
+    });
+
+    this.setState({deviceListData})
+
+    this._toggleDevice(id)
+  }
+
+  onFormSubmit(e) {
+    e.preventDefault();
   }
 
   render() {
     let deviceListData = this.state.deviceListData;
     console.log(deviceListData);
 
+    let newDevice = this.state.newDevice || "";
+
     return (
         <div className="row">
             <div className="col-12">
-                <form>
-                    <input id="newDevice" type="text" className="form-control" placeholder="Add device..." required></input>
-                    <input type="submit" name="submit"></input>
+                <form onSubmit={this.onFormSubmit}>
+                    <input onChange={this.onNewDeviceChange} value={newDevice} type="text" className="form-control" placeholder="Add device..." required></input>
+                    <input onClick={this.onNewDeviceSubmit} type="submit" name="submit"></input>
                 </form>
 
                 <ul id="taskList" className="list-unstyled">
@@ -45,15 +87,12 @@ export class DeviceList extends React.Component {
                         deviceListData.devices.map((oneDevice) =>
                             <li key={oneDevice.id.toString()}>
                                 <label>
-                                    <input type="checkbox" checked={oneDevice.completed}/>
+                                    <input type="checkbox" onChange={(e)=>this.onDeviceToggle(oneDevice.id)} checked={oneDevice.completed}/>
                                     <span className="content">{oneDevice.deviceName}</span>
                                 </label>
                             </li>
                         )
                     }
-                </ul>
-
-                <ul id="completedTaskList" className="list-unstyled">
                 </ul>
             </div>
         </div>
@@ -113,12 +152,15 @@ export class DeviceList extends React.Component {
   }
 
   async _getDeviceListData() {
-    const deviceCount = await this._deviceList.deviceCount();
+    let deviceCount = await this._deviceList.deviceCount();
+
     console.log("--- deviceCount:")
     console.log(deviceCount.toNumber())
 
+    deviceCount = deviceCount.toNumber();
+
     let devices = []
-    for(let i=0; i<deviceCount; i++) {
+    for(let i=1; i<=deviceCount; i++) {
         const device = await this._deviceList.Devices(i);
 
         console.log(device)
@@ -132,7 +174,7 @@ export class DeviceList extends React.Component {
             completed: device.completed
         }
 
-        devices[0] = one_device;
+        devices.push(one_device);
     }
 
     this.setState({ deviceListData: { deviceCount, devices } });
@@ -143,6 +185,32 @@ export class DeviceList extends React.Component {
       this._dismissTransactionError();
 
       const tx = await this._deviceList.createDevice(deviceName);
+
+      this.setState({ txBeingSent: tx.hash });
+
+      const receipt = await tx.wait();
+
+      if (receipt.status === 0) {
+        throw new Error("Transaction failed");
+      }
+    } catch (error) {
+      if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
+        return;
+      }
+
+      console.error(error);
+      this.setState({ transactionError: error });
+    } finally {
+      this.setState({ txBeingSent: undefined });
+    }
+  }
+
+  async _toggleDevice(id) {
+    try {
+      this._dismissTransactionError();
+
+      const tx = await this._deviceList.toggleCompleted(id);
+
       this.setState({ txBeingSent: tx.hash });
 
       const receipt = await tx.wait();

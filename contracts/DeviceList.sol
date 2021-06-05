@@ -38,15 +38,20 @@ contract DeviceList {
   function createDevice(string memory _deviceName) public {
     // We can print messages and values using console.log
     console.log(
-        "create one device %s by %s",
+        "create one device (%s) by %s",
         _deviceName,
         msg.sender
     );
 
-    deviceCount ++;
+    deviceCount++;
 
     Devices[deviceCount] = Device(deviceCount, _deviceName, false);
-    
+
+    console.log(
+        "one device %s",
+        Devices[deviceCount].deviceName
+    );
+
     emit DeviceCreated(deviceCount, _deviceName, false);
   }
 
