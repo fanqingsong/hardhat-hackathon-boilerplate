@@ -41,13 +41,17 @@ export class DeviceList extends React.Component {
     this.setState({"newDevice": newDevice})
   }
 
-  onNewDeviceSubmit(e) {
+  async onNewDeviceSubmit(e) {
     let newDevice = this.state.newDevice;
 
-    this._createDevice(newDevice)
+    await this._createDevice(newDevice);
+
+    this.setState({'newDevice':""})
+
+    this._getDeviceListData();
   }
 
-  onDeviceToggle(id) {
+  async onDeviceToggle(id) {
     let deviceListData = this.state.deviceListData;
     let devices = deviceListData.devices;
 
@@ -59,9 +63,11 @@ export class DeviceList extends React.Component {
       }
     });
 
-    this.setState({deviceListData})
+    this.setState({deviceListData});
 
-    this._toggleDevice(id)
+    await this._toggleDevice(id);
+
+    this._getDeviceListData();
   }
 
   onFormSubmit(e) {
