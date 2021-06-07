@@ -81,6 +81,7 @@ export class DeviceList extends React.Component {
     let newDevice = this.state.newDevice || "";
 
     return (
+      <div className="container p-4">
         <div className="row">
             <div className="col-12">
                 <form onSubmit={this.onFormSubmit}>
@@ -101,7 +102,8 @@ export class DeviceList extends React.Component {
                     }
                 </ul>
             </div>
-        </div>
+        </div>        
+      </div>
     );
   }
 
